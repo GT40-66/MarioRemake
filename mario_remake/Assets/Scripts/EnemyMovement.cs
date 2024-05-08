@@ -4,51 +4,38 @@ using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
-
     public int EnemySpeed;
     public int XMoveDirection;
-    private bool isDead = false;
-    public bool isGrounded = true;
-    
-    // Update is called once per frame
+    private bool isGrounded = true; // Assume enemy starts grounded
+
     void Update()
     {
-        if (isGrounded) // only move if the enemy is grounded
+        if (isGrounded)
         {
             // Move Horizontally
-             gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(XMoveDirection * EnemySpeed, gameObject.GetComponent<Rigidbody2D>().velocity.y);
+            gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(XMoveDirection * EnemySpeed, gameObject.GetComponent<Rigidbody2D>().velocity.y);
 
             // Check for obstacle and flip direction
-            RaycastHit2D hit = Physics2D.Raycast (transform.position, new Vector2 (XMoveDirection, 0));
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, new Vector2(XMoveDirection, 0));
             if (hit.collider != null)
             {
                 if (hit.collider.CompareTag("Wall"))
                 {
-                    Flip ();
-                    
+                    Flip();
                 }
-                else if (hit.collider.CompareTag("Player"))
-                {
-                    Destroy (hit.collider.gameObject);                
-                }
+   
             }
         }
 
-        if ( gameObject.transform.position.y < -8.1){ // if the enemy falls below y= -8.1, the enemy dies
-            Destroy (gameObject);
+        if (gameObject.transform.position.y < -8.1f)
+        {
+            Destroy(gameObject);
         }
     }
 
-    void Flip () 
+    void Flip()
     {
-        if (XMoveDirection > 0)
-        {
-            XMoveDirection = -1;
-        }
-        else
-        {
-            XMoveDirection = 1;
-        }
+        XMoveDirection *= -1; // Simplified flip direction
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -56,6 +43,11 @@ public class EnemyMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+        }
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("DESTROY");
+            Destroy(gameObject);
         }
     }
 
@@ -66,8 +58,5 @@ public class EnemyMovement : MonoBehaviour
             isGrounded = false;
         }
     }
-
-  
-
-  
 }
+

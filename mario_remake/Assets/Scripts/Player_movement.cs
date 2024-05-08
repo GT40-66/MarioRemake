@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
     public float speed = 5f;
     public float jumpStrength = 5f;
     private Rigidbody2D rb;
-    private bool isGrounded;
+    private bool isGrounded = true;
     private bool facingRight = true;
 
     void Start()
@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+       
         HandleInput();
     }
 
@@ -28,12 +29,16 @@ public class PlayerMovement : MonoBehaviour
     void HandleInput()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
-        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, LayerMask.GetMask("Ground"));
+        Debug.DrawRay(transform.position, Vector2.down * 0.1f, Color.green);
 
+        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, 0.9f, LayerMask.GetMask("Ground"));
+        
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpStrength); // Apply jumpforce
+           
+            Jump();
         }
+       
 
         if ((horizontalInput < 0 && facingRight) || (horizontalInput > 0 && !facingRight))
         {
@@ -49,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Jump()
     {
+       
         rb.velocity = new Vector2(rb.velocity.x, jumpStrength);
     }
 
@@ -66,7 +72,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision)
+   void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
