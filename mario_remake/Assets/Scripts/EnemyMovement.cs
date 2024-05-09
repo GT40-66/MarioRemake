@@ -44,10 +44,49 @@ public class EnemyMovement : MonoBehaviour
         {
             isGrounded = true;
         }
-        if (collision.gameObject.CompareTag("Player"))
+            // Check if the collision point is close to the top of the enemy
+        foreach (ContactPoint2D contact in collision.contacts)
         {
-            Debug.Log("DESTROY");
-            Destroy(gameObject);
+            // Calculate the y-coordinate of the top of the enemy's Collider
+            float enemyTopY = transform.position.y + GetComponent<Collider2D>().bounds.extents.y;
+
+            // Check if the collision point is within a small margin of the top of the enemy
+            if (contact.point.y >= enemyTopY - 0.1f) // Adjust the margin as needed
+            {
+                if (collision.gameObject.CompareTag("Player"))
+                {
+                    Debug.Log("Player collided with enemy");
+
+                // Calculate the direction in which the sprite should fly away
+                    Vector2 flyAwayDirection = (transform.position - collision.transform.position).normalized;
+
+                // Apply force to the enemy in the calculated direction
+                    Rigidbody2D rb = GetComponent<Rigidbody2D>();
+                    rb.AddForce(flyAwayDirection * 500f); // Adjust the force as needed
+
+                    // Disable the box collider
+                    Collider2D collider = GetComponent<Collider2D>();
+                    if (collider != null)
+                    {
+                        collider.enabled = false;
+                    }
+
+                    // Disable freeze rotation
+                    rb.freezeRotation = false;
+                    // Destroy the enemy after a delay
+                    Destroy(gameObject, 0.5f); // Adjust the delay as needed
+                    //Destroy(gameObject);
+                }
+            }
+        
+            else // If collision occurs on the sides of the enemy
+            {
+                if (collision.gameObject.CompareTag("Player"))
+                {
+                    Debug.Log("Player collided with enemy's side");
+                    Destroy(collision.gameObject); // Destroy the player object
+                }
+            }
         }
     }
 
